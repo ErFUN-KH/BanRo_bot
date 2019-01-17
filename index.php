@@ -5,7 +5,10 @@ require(__DIR__ . '/env.php');
 $result = json_decode(file_get_contents('php://input'));
 
 if (isset($result->message->new_chat_members[0])) {
-    foreach ($result->message->new_chat_members as $member) {
+    foreach ($result->message->new_chat_members as $key => $member) {
+        if ($key == 0) {
+            kick_user($result->message->from->id, $result->message->chat->id);
+        }
         if ($member->is_bot) {
             kick_user($member->id, $result->message->chat->id);
         }
