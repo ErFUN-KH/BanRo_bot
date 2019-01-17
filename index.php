@@ -5,12 +5,18 @@ require(__DIR__ . '/env.php');
 $result = json_decode(file_get_contents('php://input'));
 
 if (isset($result->message->new_chat_members[0])) {
-    foreach ($result->message->new_chat_members as $key => $member) {
-        if ($key == 0) {
-            kick_user($result->message->from->id, $result->message->chat->id);
-        }
+
+    $botAdder = false;
+    $removedBotAdder = false;
+
+    foreach ($result->message->new_chat_members as $member) {
         if ($member->is_bot) {
             kick_user($member->id, $result->message->chat->id);
+            $botAdder = $removedBotAdder ? false : true;
+        }
+        if ($botAdder && !$removedBotAdder) {
+            kick_user($result->message->from->id, $result->message->chat->id);
+            $removedBotAdder = true;
         }
     }
 }
